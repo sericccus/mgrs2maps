@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Generator</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbvkdgwdv3kRAA4Q3jy5r52M5sR6-OUg4" async defer></script>
+    <script src="https://unpkg.com/mgrs/dist/mgrs.min.js"></script> <!-- MGRS library -->
+</head>
+<body>
+    <div class="container">
+        <h2>Route Generator</h2>
+        <div id="headline" class="mt-3 mb-3" style="font-weight:bold;"></div>
+        <textarea id="coords-input" class="form-control" rows="5" placeholder="Enter MGRS coordinates, one per line."></textarea>
+        <button type="button" class="btn btn-primary mt-3" onclick="submitCoords()" style="width:100%;">Convert</button>
+        <div id="result" class="mt-3"></div>
+        <table class="table mt-3" id="resultsTable">
+            <thead>
+                <tr>
+                    <th>MGRS Code</th>
+                    <th>Converted Coordinates</th>
+                    <th>Place Names</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Content will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
