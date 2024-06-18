@@ -1,9 +1,10 @@
 // Function to handle the submission of coordinates
 async function submitCoords() {
     console.log("Starting coordinate submission process.");
+    const useCurrentLocation = document.getElementById('useCurrentLocation').checked;
     const isSecureOrigin = location.protocol === 'https:' || location.hostname === 'localhost';
 
-    if (isSecureOrigin && navigator.geolocation) {
+    if (useCurrentLocation && isSecureOrigin && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (position) => {
             const { latitude, longitude } = position.coords;
             const currentLocation = `${latitude},${longitude}`;
@@ -13,11 +14,13 @@ async function submitCoords() {
             alert('Error obtaining location: ' + error.message);
             console.error('Geolocation error:', error);
         });
-    } else {
+    } else if (useCurrentLocation) {
         alert('Geolocation is not supported by your browser or not running in a secure context.');
         console.warn('Geolocation is disabled in non-secure contexts.');
         const defaultLocation = '51.5074,-0.1278'; // Example: London coordinates
         processCoordinates(defaultLocation);
+    } else {
+        processCoordinates(null);
     }
 }
 
@@ -32,6 +35,8 @@ async function processCoordinates(currentLocation) {
     if (destinations.length !== lines.length) {
         alert("One or more MGRS codes were invalid and have been ignored.");
     }
+
+    updateHeadline('From Your Location to Destination');
 
     const convertedDestinations = await updateResultsTable(destinations, currentLocation);
     if (convertedDestinations.length > 0) {
@@ -50,7 +55,7 @@ function isValidMGRS(mgrs) {
 // Creates a Google Maps link using validated coordinates
 function createGoogleMapsLink(currentLocation, convertedDestinations) {
     const base_url = "https://www.google.com/maps/dir/";
-    const routeParts = [currentLocation, ...convertedDestinations.map(dest => `${dest.lat},${dest.lon}`)];
+    const routeParts = currentLocation ? [currentLocation, ...convertedDestinations.map(dest => `${dest.lat},${dest.lon}`)] : convertedDestinations.map(dest => `${dest.lat},${dest.lon}`);
     const fullUrl = base_url + routeParts.join('/') + "&travelmode=driving";
     console.log("Generated Google Maps URL:", fullUrl);
     return fullUrl;
@@ -76,8 +81,10 @@ async function updateResultsTable(destinations, currentLocation) {
     tableBody.innerHTML = ''; // Clear previous entries
     const convertedDestinations = [];
 
-    const currentPlaceName = await reverseGeocode(currentLocation);
-    addTableRow(tableBody, "Current Location", currentLocation, currentPlaceName);
+    if (currentLocation) {
+        const currentPlaceName = await reverseGeocode(currentLocation);
+        addTableRow(tableBody, "Current Location", currentLocation, currentPlaceName);
+    }
 
     for (const dest of destinations) {
         const latlon = convertMgrsToLatLon(dest);
@@ -101,7 +108,7 @@ function addTableRow(tableBody, label, coords, placeName) {
     
     // Format coordinates as "N: {latitude}\nE: {longitude}"
     const [lat, lon] = coords.split(',');
-    row.insertCell(1).innerHTML = `${lat}<br>${lon}`;
+    row.insertCell(1).innerHTML = `N: ${lat}<br>E: ${lon}`;
     
     row.insertCell(2).textContent = placeName;
     console.log("Added row:", { label, coords, placeName });
@@ -111,7 +118,7 @@ function addTableRow(tableBody, label, coords, placeName) {
 async function reverseGeocode(coords) {
     const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords}&key=AIzaSyBbvkdgwdv3kRAA4Q3jy5r52M5sR6-OUg4`);
     const data = await response.json();
-    return data.results[0]?.formatted_address || "Do is was schief 'gang.\nUff de Kart' sollds basse.";
+    return data.results[0]?.formatted_address || "Unknown location";
 }
 
 // Converts MGRS coordinates to latitude and longitude using the MGRS library
