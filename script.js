@@ -33,8 +33,6 @@ async function processCoordinates(currentLocation) {
         alert("One or more MGRS codes were invalid and have been ignored.");
     }
 
-    updateHeadline('From Your Location to Destination');
-
     const convertedDestinations = await updateResultsTable(destinations, currentLocation);
     if (convertedDestinations.length > 0) {
         const routeUrl = createGoogleMapsLink(currentLocation, convertedDestinations);
