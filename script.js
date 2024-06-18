@@ -1,4 +1,3 @@
-// Function to handle the submission of coordinates
 async function submitCoords() {
     console.log("Starting coordinate submission process.");
     const useCurrentLocation = document.getElementById('useCurrentLocation').checked;
@@ -25,11 +24,8 @@ async function submitCoords() {
     }
 }
 
-// Process coordinates input
 async function processCoordinates(currentLocation) {
     const input = document.getElementById('coords-input').value;
-
-    // Splitting the input into lines, processing each line, and validating MGRS format
     const lines = input.toUpperCase().split('\n').filter(line => line.trim());
     const destinations = lines.map(line => line.replace(/\s+/g, '')).filter(line => isValidMGRS(line));
 
@@ -39,7 +35,6 @@ async function processCoordinates(currentLocation) {
 
     const convertedDestinations = await updateResultsTable(destinations, currentLocation);
 
-    // Get the last destination address for the headline
     const lastDestination = convertedDestinations[convertedDestinations.length - 1];
     const lastDestinationAddress = lastDestination ? await reverseGeocode(`${lastDestination.lat},${lastDestination.lon}`) : "Unknown location";
     const startLocationAddress = currentLocation ? await reverseGeocode(currentLocation) : "Unknown location";
@@ -54,13 +49,11 @@ async function processCoordinates(currentLocation) {
     }
 }
 
-// Validates MGRS codes using a basic regex pattern
 function isValidMGRS(mgrs) {
     const regex = /^[0-9]{1,2}[C-X][A-HJ-NP-Z]{2}\s*\d{1,5}\s*\d{1,5}$/i;
     return regex.test(mgrs);
 }
 
-// Creates a Google Maps link using validated coordinates
 function createGoogleMapsLink(currentLocation, convertedDestinations) {
     const base_url = "https://www.google.com/maps/dir/";
     const routeParts = currentLocation ? [currentLocation, ...convertedDestinations.map(dest => `${dest.lat},${dest.lon}`)] : convertedDestinations.map(dest => `${dest.lat},${dest.lon}`);
@@ -69,7 +62,6 @@ function createGoogleMapsLink(currentLocation, convertedDestinations) {
     return fullUrl;
 }
 
-// Creates a button to view the route on Google Maps
 function createRouteButton(url) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '';
@@ -82,7 +74,6 @@ function createRouteButton(url) {
     resultDiv.appendChild(button);
 }
 
-// Updates the results table with converted MGRS coordinates and place names
 async function updateResultsTable(destinations, currentLocation) {
     console.log("Updating results table with converted MGRS coordinates and place names.");
     const tableBody = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
@@ -109,7 +100,6 @@ async function updateResultsTable(destinations, currentLocation) {
     return convertedDestinations;
 }
 
-// Adds a row to the specified table
 function addTableRow(tableBody, label, coords, placeName) {
     let row = tableBody.insertRow();
     row.insertCell(0).textContent = label;
@@ -122,14 +112,12 @@ function addTableRow(tableBody, label, coords, placeName) {
     console.log("Added row:", { label, coords: formattedCoords, placeName });
 }
 
-// Reverse geocodes coordinates using the Google Maps API
 async function reverseGeocode(coords) {
     const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords}&key=AIzaSyBbvkdgwdv3kRAA4Q3jy5r52M5sR6-OUg4`);
     const data = await response.json();
     return data.results[0]?.formatted_address || "Unknown location";
 }
 
-// Converts MGRS coordinates to latitude and longitude using the MGRS library
 function convertMgrsToLatLon(mgrsString) {
     try {
         const [lon, lat] = window.mgrs.toPoint(mgrsString);
@@ -140,18 +128,15 @@ function convertMgrsToLatLon(mgrsString) {
     }
 }
 
-// Updates the headline based on the route details
 function updateHeadline(text) {
     const headlineDiv = document.getElementById('headline');
     headlineDiv.textContent = text;
 }
 
-// Formats MGRS coordinates with spaces between the grid zone, 100km square, easting, and northing
 function formatMGRS(mgrs) {
     return mgrs.replace(/^(\d{1,2}[C-X])([A-HJ-NP-Z]{2})(\d{1,5})(\d{1,5})$/, '$1 $2 $3 $4');
 }
 
-// Removes codes from the address and ensures zip code, town name, and country start on a new line
 function cleanAddress(address) {
     const cleaned = address.replace(/[\d\w]{2,}\+[\d\w]{2,}/g, '').trim();
     return cleaned.replace(/, /g, '\n');
