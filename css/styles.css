@@ -1,24 +1,26 @@
-/* styles.css */
+/* Base styles */
 body {
     font-family: Arial, sans-serif;
-}
-
-@media (max-width: 600px) {
+  }
+  
+  /* Mobile styles */
+  @media (max-width: 600px) {
     body {
-        font-size: 14px;
+      font-size: 14px;
     }
-
+  
     .container {
-        padding: 10px;
+      padding: 10px;
     }
-}
-
-@media (min-width: 601px) {
+  }
+  
+  /* Desktop styles */
+  @media (min-width: 601px) {
     body {
-        font-size: 16px;
+      font-size: 16px;
     }
-
+  
     .container {
-        padding: 20px;
+      padding: 20px;
     }
-}
+  }  
