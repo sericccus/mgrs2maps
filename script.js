@@ -9,18 +9,19 @@ async function submitCoords() {
             const { latitude, longitude } = position.coords;
             const currentLocation = `${latitude},${longitude}`;
             console.log("Current location obtained:", currentLocation);
-            processCoordinates(currentLocation);
-        }, (error) => {
+            await processCoordinates(currentLocation);
+        }, async (error) => {
             alert('Error obtaining location: ' + error.message);
             console.error('Geolocation error:', error);
+            await processCoordinates(null);
         });
     } else if (useCurrentLocation) {
         alert('Geolocation is not supported by your browser or not running in a secure context.');
         console.warn('Geolocation is disabled in non-secure contexts.');
         const defaultLocation = '51.5074,-0.1278'; // Example: London coordinates
-        processCoordinates(defaultLocation);
+        await processCoordinates(defaultLocation);
     } else {
-        processCoordinates(null);
+        await processCoordinates(null);
     }
 }
 
@@ -36,9 +37,16 @@ async function processCoordinates(currentLocation) {
         alert("One or more MGRS codes were invalid and have been ignored.");
     }
 
-    updateHeadline('From Your Location to Destination');
-
     const convertedDestinations = await updateResultsTable(destinations, currentLocation);
+
+    // Get the last destination address for the headline
+    const lastDestination = convertedDestinations[convertedDestinations.length - 1];
+    const lastDestinationAddress = lastDestination ? await reverseGeocode(`${lastDestination.lat},${lastDestination.lon}`) : "Unknown location";
+    const startLocationAddress = currentLocation ? await reverseGeocode(currentLocation) : "Unknown location";
+
+    const headlineText = currentLocation ? `From ${startLocationAddress} to ${lastDestinationAddress}` : `To ${lastDestinationAddress}`;
+    updateHeadline(headlineText);
+
     if (convertedDestinations.length > 0) {
         const routeUrl = createGoogleMapsLink(currentLocation, convertedDestinations);
         createRouteButton(routeUrl);
@@ -91,7 +99,7 @@ async function updateResultsTable(destinations, currentLocation) {
         if (latlon) {
             convertedDestinations.push(latlon);
             const placeName = await reverseGeocode(`${latlon.lat},${latlon.lon}`);
-            addTableRow(tableBody, dest, `${latlon.lat},${latlon.lon}`, placeName || 'Name not available');
+            addTableRow(tableBody, formatMGRS(dest), `${latlon.lat} ${latlon.lon}`, cleanAddress(placeName) || 'Name not available');
         } else {
             console.error("Invalid conversion for:", dest);
         }
@@ -105,13 +113,13 @@ async function updateResultsTable(destinations, currentLocation) {
 function addTableRow(tableBody, label, coords, placeName) {
     let row = tableBody.insertRow();
     row.insertCell(0).textContent = label;
-    
+
     // Format coordinates as "N: {latitude}\nE: {longitude}"
-    const [lat, lon] = coords.split(',');
-    row.insertCell(1).innerHTML = `N: ${lat}<br>E: ${lon}`;
-    
-    row.insertCell(2).textContent = placeName;
-    console.log("Added row:", { label, coords, placeName });
+    const formattedCoords = coords.replace(/(\d{5})(\d{5})/, '$1 $2');
+    row.insertCell(1).textContent = formattedCoords;
+
+    row.insertCell(2).innerHTML = placeName;
+    console.log("Added row:", { label, coords: formattedCoords, placeName });
 }
 
 // Reverse geocodes coordinates using the Google Maps API
@@ -136,4 +144,15 @@ function convertMgrsToLatLon(mgrsString) {
 function updateHeadline(text) {
     const headlineDiv = document.getElementById('headline');
     headlineDiv.textContent = text;
+}
+
+// Formats MGRS coordinates with spaces between the grid zone, 100km square, easting, and northing
+function formatMGRS(mgrs) {
+    return mgrs.replace(/^(\d{1,2}[C-X])([A-HJ-NP-Z]{2})(\d{1,5})(\d{1,5})$/, '$1 $2 $3 $4');
+}
+
+// Removes codes from the address and ensures zip code, town name, and country start on a new line
+function cleanAddress(address) {
+    const cleaned = address.replace(/[\d\w]{2,}\+[\d\w]{2,}/g, '').trim();
+    return cleaned.replace(/, /g, '\n');
 }
