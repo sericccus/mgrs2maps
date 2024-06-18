@@ -55,9 +55,12 @@ function isValidMGRS(mgrs) {
 }
 
 function createGoogleMapsLink(currentLocation, convertedDestinations) {
-    const base_url = "https://www.google.com/maps/dir/";
-    const routeParts = currentLocation ? [currentLocation, ...convertedDestinations.map(dest => `${dest.lat},${dest.lon}`)] : convertedDestinations.map(dest => `${dest.lat},${dest.lon}`);
-    const fullUrl = base_url + routeParts.join('/') + "&travelmode=driving";
+    const base_url = "https://www.google.com/maps/dir/?api=1&travelmode=driving";
+    const origin = currentLocation ? `&origin=${currentLocation}` : '';
+    const destinations = convertedDestinations.map(dest => `${dest.lat},${dest.lon}`).join('|');
+    const destination = `&destination=${convertedDestinations[convertedDestinations.length - 1].lat},${convertedDestinations[convertedDestinations.length - 1].lon}`;
+    const waypoints = convertedDestinations.length > 1 ? `&waypoints=${destinations}` : '';
+    const fullUrl = base_url + origin + destination + waypoints;
     console.log("Generated Google Maps URL:", fullUrl);
     return fullUrl;
 }
