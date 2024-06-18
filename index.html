@@ -3,39 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MGRS to Maps</title>
+    <title>Route aus MGRS Koordinaten generieren</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <script src="js/jquery-3.6.0.min.js"></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbvkdgwdv3kRAA4Q3jy5r52M5sR6-OUg4" async defer></script>
-    <script src="js/mgrs.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
+    <script>
+        (g => {
+            var h, a, k,
+                p = "The Google Maps JavaScript API",
+                c = "google",
+                l = "importLibrary",
+                q = "__ib__",
+                m = document,
+                b = window;
+            
+            // Initialize google namespace
+            b = b[c] || (b[c] = {});
+            var d = b.maps || (b.maps = {}),
+                r = new Set,
+                e = new URLSearchParams,
+                u = () => h || (h = new Promise(async (f, n) => {
+                    // Create script element
+                    await (a = m.createElement("script"));
+                    
+                    // Add required parameters to URLSearchParams
+                    e.set("libraries", [...r] + "");
+                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    
+                    // Set script source to Google Maps API URL with parameters
+                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                    
+                    // Define callback to resolve the promise
+                    d[q] = f;
+                    
+                    // Error handling
+                    a.onerror = () => h = n(Error(p + " could not load."));
+                    
+                    // Set nonce for CSP
+                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                    
+                    // Append script to the document head
+                    m.head.append(a)
+                }));
+            
+            // Check if importLibrary is already defined
+            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+        })({
+            key: "YOUR_API_KEY", // Your API key
+            v: "weekly", // Version of the API
+            // Add other bootstrap parameters as needed, using camel case.
+        });
+    </script>
+    <script src="js/mgrs.min.js"></script>
+    <script type="module" src="js/main.js"></script>
 </head>
 <body>
     <div class="container">
         <h2>Route aus MGRS Koordinaten generieren</h2>
         <div id="headline" class="mt-3 mb-3" style="font-weight:bold;"></div>
         <div class="form-check mb-3">
-            <input type="checkbox" class="form-check-input" id="useCurrentLocation" checked>
-            <label class="form-check-label" for="useCurrentLocation">Aktuelle Position als Start verwenden</label>
+            <input type="checkbox" class="form-check-input" id="useCurrentLocation">
+            <label class="form-check-label" for="useCurrentLocation">Aktuelle Position verwenden</label>
         </div>
-        <textarea id="coords-input" class="form-control" rows="5" placeholder="32U NF 21085 73351&#10;32U NE 61430 73289"></textarea>
-        <button type="button" class="btn btn-primary mt-3" onclick="submitCoords()" style="width:100%;">Konvertieren</button>
-        <div id="result" class="mt-3"></div>
-        <table class="table mt-3" id="resultsTable">
+        <textarea id="coords-input" class="form-control mb-3" rows="5" placeholder="MGRS Koordinaten hier eingeben..."></textarea>
+        <button onclick="submitCoords()" class="btn btn-primary mb-3">Konvertieren</button>
+        <div id="message" style="display: none; color: red;"></div>
+        <table id="resultsTable" class="table table-striped" style="display: none;">
             <thead>
                 <tr>
-                    <th>MGRS Code</th>
+                    <th>Label</th>
                     <th>Koordinaten</th>
                     <th>Ort</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Content will be dynamically inserted here -->
-            </tbody>
+            <tbody></tbody>
         </table>
+        <div id="result"></div>
+        <div id="map" style="height: 500px; width: 100%;"></div>
     </div>
-    <script src="script.js"></script>
 </body>
 </html>
