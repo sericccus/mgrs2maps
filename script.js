@@ -68,7 +68,7 @@ function createRouteButton(url) {
     button.target = "_blank";
     button.className = "btn btn-success";
     button.style.width = "100%";
-    button.textContent = "View Route on Google Maps";
+    button.textContent = "zu Google";
     resultDiv.appendChild(button);
 }
 
