@@ -86,7 +86,7 @@ async function updateResultsTable(destinations, currentLocation) {
         if (latlon) {
             convertedDestinations.push(latlon);
             const placeName = await reverseGeocode(`${latlon.lat},${latlon.lon}`);
-            addTableRow(tableBody, dest, `${latlon.lat}, ${latlon.lon}`, placeName || 'Name not available');
+            addTableRow(tableBody, dest, `${latlon.lat},${latlon.lon}`, placeName || 'Name not available');
         } else {
             console.error("Invalid conversion for:", dest);
         }
@@ -100,14 +100,18 @@ async function updateResultsTable(destinations, currentLocation) {
 function addTableRow(tableBody, label, coords, placeName) {
     let row = tableBody.insertRow();
     row.insertCell(0).textContent = label;
-    row.insertCell(1).textContent = coords;
+    
+    // Format coordinates as "N: {latitude}\nE: {longitude}"
+    const [lat, lon] = coords.split(',');
+    row.insertCell(1).innerHTML = `N: ${lat}<br>E: ${lon}`;
+    
     row.insertCell(2).textContent = placeName;
     console.log("Added row:", { label, coords, placeName });
 }
 
 // Reverse geocodes coordinates using the Google Maps API
 async function reverseGeocode(coords) {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords}&key=AIzaSyBbvkdgwdv3kRAA4Q3jy5r52M5sR6-OUg4`);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords}&key=YOUR_RESTRICTED_API_KEY`);
     const data = await response.json();
     return data.results[0]?.formatted_address || "Unknown location";
 }
