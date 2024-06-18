@@ -103,7 +103,7 @@ function addTableRow(tableBody, label, coords, placeName) {
     
     // Format coordinates as "N: {latitude}\nE: {longitude}"
     const [lat, lon] = coords.split(',');
-    row.insertCell(1).innerHTML = `N: ${lat}<br>E: ${lon}`;
+    row.insertCell(1).innerHTML = `${lat}<br>${lon}`;
     
     row.insertCell(2).textContent = placeName;
     console.log("Added row:", { label, coords, placeName });
@@ -113,7 +113,7 @@ function addTableRow(tableBody, label, coords, placeName) {
 async function reverseGeocode(coords) {
     const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords}&key=AIzaSyBbvkdgwdv3kRAA4Q3jy5r52M5sR6-OUg4`);
     const data = await response.json();
-    return data.results[0]?.formatted_address || "Unknown location";
+    return data.results[0]?.formatted_address || "Do is was schief 'gang.\nUff de Kart' sollds basse.";
 }
 
 // Converts MGRS coordinates to latitude and longitude using the MGRS library
