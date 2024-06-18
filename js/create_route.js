@@ -17,15 +17,15 @@ function createGoogleMapsLink(startingLocation, finalDestination, waypoints) {
     return fullUrl;
 }
 
-function createRouteButton(url) {
-    const resultDiv = document.getElementById('result');
+function createRouteButton(url, containerId) {
+    const resultDiv = document.getElementById(containerId);
     resultDiv.innerHTML = '';
     const button = document.createElement('a');
     button.href = url;
     button.target = "_blank";
     button.className = "btn btn-success";
     button.style.width = "100%";
-    button.textContent = "Open in Google Maps";
+    button.textContent = "In Google Maps öffnen";
     resultDiv.appendChild(button);
 }
 

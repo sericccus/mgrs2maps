@@ -11,7 +11,8 @@ async function submitCoords() {
 
     if (start && end) {
         const routeUrl = createGoogleMapsLink(start, end, Object.values(waypoints));
-        createRouteButton(routeUrl);
+        createRouteButton(routeUrl, 'button-container-top');
+        createRouteButton(routeUrl, 'button-container-bottom');
         console.log("Route URL created:", routeUrl);
     }
 }

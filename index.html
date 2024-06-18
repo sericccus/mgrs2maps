@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Route aus MGRS Koordinaten generieren</title>
+    <title>mgrs2maps</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script>
@@ -59,26 +59,31 @@
 </head>
 <body>
     <div class="container">
-        <h2>Route aus MGRS Koordinaten generieren</h2>
+        <h2>Route aus UTM-Ref Koordinaten generieren</h2>
         <div id="headline" class="mt-3 mb-3" style="font-weight:bold;"></div>
         <div class="form-check mb-3">
             <input type="checkbox" class="form-check-input" id="useCurrentLocation">
             <label class="form-check-label" for="useCurrentLocation">Aktuelle Position verwenden</label>
         </div>
-        <textarea id="coords-input" class="form-control mb-3" rows="5" placeholder="MGRS Koordinaten hier eingeben..."></textarea>
-        <button onclick="submitCoords()" class="btn btn-primary mb-3">Konvertieren</button>
+        <textarea id="coords-input" class="form-control mb-3" rows="5" placeholder="UTM-Ref Koordinaten hier eingeben...&#10;32U NF 21085 73351&#10;32U NE 61430 73289"></textarea>
+        <div class="d-flex flex-row flex-wrap justify-content-start align-items-start">
+            <button onclick="submitCoords()" class="btn btn-primary mb-3 me-2">Generieren</button>
+            <div id="button-container-top" class="ml-2"></div> <!-- Button container next to/under the convert button -->
+        </div>
         <div id="message" style="display: none; color: red;"></div>
+        
         <table id="resultsTable" class="table table-striped" style="display: none;">
             <thead>
                 <tr>
-                    <th>Label</th>
+                    <th></th>
+                    <th>UTM-Ref</th>
                     <th>Koordinaten</th>
                     <th>Ort</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-        <div id="result"></div>
+        <div id="button-container-bottom" class="mb-3"></div>
         <div id="map" style="height: 500px; width: 100%;"></div>
     </div>
 </body>

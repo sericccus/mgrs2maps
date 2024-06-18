@@ -14,7 +14,7 @@ function displayTable(startingLocation, finalDestination, list_of_waypoints) {
     }
 
     if (finalDestination) {
-        addTableRow(tableBody, 'End', formatMGRS(finalDestination.mgrs), formatLatLon(finalDestination.neCoordinate), formatPlace(finalDestination.place));
+        addTableRow(tableBody, 'Ziel', formatMGRS(finalDestination.mgrs), formatLatLon(finalDestination.neCoordinate), formatPlace(finalDestination.place));
     }
 
     resultsTable.style.display = 'table';
