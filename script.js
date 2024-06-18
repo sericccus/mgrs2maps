@@ -11,12 +11,11 @@ async function submitCoords() {
             processCoordinates(currentLocation);
         }, (error) => {
             alert('Error obtaining location: ' + error.message);
-            console.error('Geolocation error:', error); // Debugging statement
+            console.error('Geolocation error:', error);
         });
     } else {
         alert('Geolocation is not supported by your browser or not running in a secure context.');
         console.warn('Geolocation is disabled in non-secure contexts.');
-        // Use a default location or ask the user for a starting point
         const defaultLocation = '51.5074,-0.1278'; // Example: London coordinates
         processCoordinates(defaultLocation);
     }
@@ -40,7 +39,7 @@ async function processCoordinates(currentLocation) {
     if (convertedDestinations.length > 0) {
         const routeUrl = createGoogleMapsLink(currentLocation, convertedDestinations);
         createRouteButton(routeUrl);
-        console.log("Route URL created:", routeUrl); // Debugging statement
+        console.log("Route URL created:", routeUrl);
     }
 }
 
@@ -55,7 +54,7 @@ function createGoogleMapsLink(currentLocation, convertedDestinations) {
     const base_url = "https://www.google.com/maps/dir/";
     const routeParts = [currentLocation, ...convertedDestinations.map(dest => `${dest.lat},${dest.lon}`)];
     const fullUrl = base_url + routeParts.join('/') + "&travelmode=driving";
-    console.log("Generated Google Maps URL:", fullUrl); // Debugging statement
+    console.log("Generated Google Maps URL:", fullUrl);
     return fullUrl;
 }
 
@@ -89,7 +88,7 @@ async function updateResultsTable(destinations, currentLocation) {
             const placeName = await reverseGeocode(`${latlon.lat},${latlon.lon}`);
             addTableRow(tableBody, dest, `${latlon.lat}, ${latlon.lon}`, placeName || 'Name not available');
         } else {
-            console.error("Invalid conversion for:", dest); // Debugging statement
+            console.error("Invalid conversion for:", dest);
         }
     }
 
@@ -119,7 +118,7 @@ function convertMgrsToLatLon(mgrsString) {
         const [lon, lat] = window.mgrs.toPoint(mgrsString);
         return { lat, lon };
     } catch (error) {
-        console.error('Error converting MGRS to coordinates:', error); // Debugging statement
+        console.error('Error converting MGRS to coordinates:', error);
         return null;
     }
 }
