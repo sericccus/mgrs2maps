@@ -1,3 +1,4 @@
+// Function to display the table with route information
 function displayTable(startingLocation, finalDestination, list_of_waypoints) {
     const resultsTable = document.getElementById('resultsTable');
     const tableBody = resultsTable.getElementsByTagName('tbody')[0];
@@ -6,63 +7,49 @@ function displayTable(startingLocation, finalDestination, list_of_waypoints) {
     let index = 1;
 
     if (startingLocation) {
-        addTableRow(tableBody, 'Start', formatMGRS(startingLocation.mgrs), formatLatLon(startingLocation.neCoordinate), formatPlace(startingLocation.place));
+        addTableRow(tableBody, 'Start', startingLocation.mgrs, startingLocation.neCoordinate.lat, startingLocation.neCoordinate.lon, startingLocation.place);
     }
 
-    for (const [key, data] of Object.entries(list_of_waypoints)) {
-        addTableRow(tableBody, index++, formatMGRS(data.mgrs), formatLatLon(data.neCoordinate), formatPlace(data.place));
+    for (const waypoint of list_of_waypoints) {
+        addTableRow(tableBody, index++, waypoint.mgrs, waypoint.neCoordinate.lat, waypoint.neCoordinate.lon, waypoint.place);
     }
 
     if (finalDestination) {
-        addTableRow(tableBody, 'Ziel', formatMGRS(finalDestination.mgrs), formatLatLon(finalDestination.neCoordinate), formatPlace(finalDestination.place));
+        addTableRow(tableBody, 'End', finalDestination.mgrs, finalDestination.neCoordinate.lat, finalDestination.neCoordinate.lon, finalDestination.place);
     }
 
     resultsTable.style.display = 'table';
 }
 
-// Adds a row to the specified table
-function addTableRow(tableBody, label, mgrs, latLon, place) {
+// Helper function to add a row to the table
+function addTableRow(tableBody, label, mgrs, lat, lon, place) {
     let row = tableBody.insertRow();
     row.insertCell(0).textContent = label;
 
-    // MGRS coordinates split into two lines
+    // Format MGRS
+    let formattedMgrs = formatMGRS(mgrs);
     let mgrsCell = row.insertCell(1);
-    mgrsCell.innerHTML = mgrs;
+    mgrsCell.innerHTML = formattedMgrs.replace(/\s/g, '<br>');
 
-    // Lat/Lon coordinates split into two lines
+    // Format Lat/Lon
     let latLonCell = row.insertCell(2);
-    latLonCell.innerHTML = latLon;
+    latLonCell.innerHTML = `${lat.toFixed(5)}<br>${lon.toFixed(5)}`;
 
-    // Place name split into two lines
+    // Format Place
     let placeCell = row.insertCell(3);
-    placeCell.innerHTML = place;
-
-    console.log("Added row:", { label, mgrs, latLon, place });
+    placeCell.innerHTML = formatPlace(place);
 }
 
-// Format MGRS coordinates to be split into two lines
+// Function to format MGRS coordinates for display
 function formatMGRS(mgrs) {
-    const regex = /^(\d{1,2}[C-X][A-HJ-NP-Z]{2})(\d{5})(\d{5})$/;
-    const match = mgrs.match(regex);
-    if (match) {
-        return `${match[1]}<br>${match[2]} ${match[3]}`;
-    }
-    return mgrs; // Return as is if it doesn't match the expected format
+    return mgrs.replace(/^(\d{1,2}[C-X])([A-HJ-NP-Z]{2})(\d{5})(\d{5})$/, '$1 $2 $3 $4');
 }
 
-// Format Lat/Lon coordinates to be split into two lines
-function formatLatLon(neCoordinate) {
-    return `${neCoordinate.lat}<br>${neCoordinate.lon}`;
-}
-
-// Format place into two lines: line 1 (place name, street), line 2 (zip code, city, country)
+// Function to format place for display
 function formatPlace(place) {
-    // Assuming the place string is already cleaned and separated by newline characters
-    const lines = place.split('\n');
-    if (lines.length > 1) {
-        return `${lines[0]}<br>${lines.slice(1).join(', ')}`;
-    }
-    return place; // Return as is if it doesn't have enough lines
+    const parts = place.split(', ');
+    const lastLine = parts.splice(-3).join(', ');
+    return `${parts.join(', ')}<br>${lastLine}`;
 }
 
 export { displayTable };

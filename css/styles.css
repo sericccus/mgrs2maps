@@ -24,3 +24,11 @@ body {
       padding: 20px;
     }
   }  
+.buttons-div {
+  display: flex;
+  gap: 1vw;
+}
+
+#add-button {
+  font-weight: bolder;
+}

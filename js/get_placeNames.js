@@ -1,29 +1,19 @@
-// Reverse geocode coordinates using the Google Maps API
-async function reverseGeocode(coords) {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lon}&key=YOUR_API_KEY`);
-    const data = await response.json();
-    return data.results[0]?.formatted_address || "Unknown location";
-}
-
-// Function to clean address
-function cleanAddress(address) {
-    const cleaned = address.replace(/[\d\w]{2,}\+[\d\w]{2,}/g, '').trim();
-    return cleaned.replace(/, /g, '\n');
-}
-
-// Function to get place names for the waypoints, start location, and final destination
+// Function to reverse geocode coordinates using OpenStreetMap Nominatim API
 async function getPlaceNames({ startingLocation, finalDestination, list_of_waypoints }) {
+    const reverseGeocode = async (lat, lon) => {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+        const data = await response.json();
+        return data.display_name;
+    };
+
     if (startingLocation) {
-        startingLocation.place = cleanAddress(await reverseGeocode(startingLocation.neCoordinate));
+        startingLocation.place = await reverseGeocode(startingLocation.neCoordinate.lat, startingLocation.neCoordinate.lon);
     }
-
     if (finalDestination) {
-        finalDestination.place = cleanAddress(await reverseGeocode(finalDestination.neCoordinate));
+        finalDestination.place = await reverseGeocode(finalDestination.neCoordinate.lat, finalDestination.neCoordinate.lon);
     }
-
-    for (const key in list_of_waypoints) {
-        const waypoint = list_of_waypoints[key];
-        waypoint.place = cleanAddress(await reverseGeocode(waypoint.neCoordinate));
+    for (let waypoint of list_of_waypoints) {
+        waypoint.place = await reverseGeocode(waypoint.neCoordinate.lat, waypoint.neCoordinate.lon);
     }
 
     return { startingLocation, finalDestination, list_of_waypoints };

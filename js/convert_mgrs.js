@@ -1,7 +1,9 @@
-// Convert MGRS to LatLon using the MGRS library
+import * as mgrs from './mgrs.min.js';
+
+// Function to convert MGRS to LatLon using the MGRS library
 function convertMgrsToLatLon(mgrsString) {
     try {
-        const [lon, lat] = window.mgrs.toPoint(mgrsString);
+        const [lon, lat] = window.mgrs.toPoint(mgrsString.replace(/\s+/g, ''));
         return { lat, lon };
     } catch (error) {
         console.error('Error converting MGRS to coordinates:', error);
@@ -9,7 +11,7 @@ function convertMgrsToLatLon(mgrsString) {
     }
 }
 
-// Convert LatLon to MGRS (for user location conversion)
+// Function to convert LatLon to MGRS (for user location conversion)
 function convertLatLonToMgrs(latLon) {
     try {
         return window.mgrs.forward([latLon.lon, latLon.lat]);
@@ -19,36 +21,34 @@ function convertLatLonToMgrs(latLon) {
     }
 }
 
-// Convert MGRS coordinates and create waypoints list
+// Function to convert MGRS coordinates and create a list of waypoints
 function convertMgrs(mgrs_coords) {
     const LatLon_coords = mgrs_coords.map(mgrs => convertMgrsToLatLon(mgrs));
     console.log("LatLon Coordinates:", LatLon_coords);
 
-    const list_of_waypoints = {};
+    const full_route = [];
     let startingLocation = null;
     let finalDestination = null;
 
     for (let i = 0; i < LatLon_coords.length; i++) {
         const coords = LatLon_coords[i];
-        const locationKey = `location_${i + 1}`;
-        list_of_waypoints[locationKey] = {
+        const location = {
             mgrs: formatMGRS(mgrs_coords[i]), // Apply formatting here
             neCoordinate: coords
         };
-        console.log(locationKey, list_of_waypoints[locationKey]);
+        full_route.push(location);
+        console.log(`Location ${i + 1}`, location);
     }
 
     if (LatLon_coords.length > 0) {
-        startingLocation = list_of_waypoints['location_1'];
-        finalDestination = list_of_waypoints[`location_${LatLon_coords.length}`];
-        delete list_of_waypoints['location_1'];
-        delete list_of_waypoints[`location_${LatLon_coords.length}`];
+        startingLocation = full_route[0];
+        finalDestination = full_route[full_route.length - 1];
     }
 
-    return { startingLocation, finalDestination, list_of_waypoints };
+    return { startingLocation, finalDestination, full_route };
 }
 
-// Function to format MGRS coordinates
+// Function to format MGRS coordinates for display
 function formatMGRS(mgrs) {
     return mgrs.replace(/^(\d{1,2}[C-X])([A-HJ-NP-Z]{2})(\d{5})(\d{5})$/, '$1 $2 $3 $4');
 }

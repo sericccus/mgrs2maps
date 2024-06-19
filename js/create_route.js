@@ -1,32 +1,27 @@
-// Function to create a Google Maps link that opens in the mobile browser
-function createGoogleMapsLink(startingLocation, finalDestination, waypoints) {
-    const base_url = "https://maps.google.com/maps/dir/";
-    const origin = startingLocation ? `${startingLocation.neCoordinate.lat},${startingLocation.neCoordinate.lon}` : '';
-    const destination = finalDestination ? `${finalDestination.neCoordinate.lat},${finalDestination.neCoordinate.lon}` : '';
-    const waypointsParam = waypoints.length > 0 ? waypoints.map(wp => `${wp.neCoordinate.lat},${wp.neCoordinate.lon}`).join('/') : '';
-    const travelmode = "/data=!3m1!4b1"; // Example additional parameters
-
-    let fullUrl;
-    if (waypointsParam) {
-        fullUrl = `${base_url}${origin}/${waypointsParam}/${destination}${travelmode}`;
-    } else {
-        fullUrl = `${base_url}${origin}/${destination}${travelmode}`;
+// Function to create a Google Maps link for the route
+function createGoogleMapsLink(start, end, waypoints) {
+    let url = `https://www.google.com/maps/dir/?api=1&origin=${start.neCoordinate.lat},${start.neCoordinate.lon}&destination=${end.neCoordinate.lat},${end.neCoordinate.lon}&travelmode=driving`;
+    
+    if (waypoints.length > 0) {
+        const waypointStr = waypoints.map(wp => `${wp.neCoordinate.lat},${wp.neCoordinate.lon}`).join('|');
+        url += `&waypoints=${encodeURIComponent(waypointStr)}`;
     }
-
-    console.log("Generated Google Maps URL:", fullUrl);
-    return fullUrl;
+    
+    return url;
 }
 
-function createRouteButton(url, containerId) {
-    const resultDiv = document.getElementById(containerId);
-    resultDiv.innerHTML = '';
+// Function to create a button for the Google Maps link
+function createRouteButton(routeUrl, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = ''; // Clear previous buttons
+
     const button = document.createElement('a');
-    button.href = url;
-    button.target = "_blank";
-    button.className = "btn btn-success";
-    button.style.width = "100%";
-    button.textContent = "In Google Maps öffnen";
-    resultDiv.appendChild(button);
+    button.href = routeUrl;
+    button.target = '_blank';
+    button.classList.add('btn', 'btn-primary');
+    button.innerText = 'In Google Maps öffnen';
+
+    container.appendChild(button);
 }
 
 export { createGoogleMapsLink, createRouteButton };

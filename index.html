@@ -6,54 +6,6 @@
     <title>mgrs2maps</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
-    <script>
-        (g => {
-            var h, a, k,
-                p = "The Google Maps JavaScript API",
-                c = "google",
-                l = "importLibrary",
-                q = "__ib__",
-                m = document,
-                b = window;
-            
-            // Initialize google namespace
-            b = b[c] || (b[c] = {});
-            var d = b.maps || (b.maps = {}),
-                r = new Set,
-                e = new URLSearchParams,
-                u = () => h || (h = new Promise(async (f, n) => {
-                    // Create script element
-                    await (a = m.createElement("script"));
-                    
-                    // Add required parameters to URLSearchParams
-                    e.set("libraries", [...r] + "");
-                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-                    e.set("callback", c + ".maps." + q);
-                    
-                    // Set script source to Google Maps API URL with parameters
-                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-                    
-                    // Define callback to resolve the promise
-                    d[q] = f;
-                    
-                    // Error handling
-                    a.onerror = () => h = n(Error(p + " could not load."));
-                    
-                    // Set nonce for CSP
-                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-                    
-                    // Append script to the document head
-                    m.head.append(a)
-                }));
-            
-            // Check if importLibrary is already defined
-            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
-        })({
-            key: "YOUR_API_KEY", // Your API key
-            v: "weekly", // Version of the API
-            // Add other bootstrap parameters as needed, using camel case.
-        });
-    </script>
     <script src="js/mgrs.min.js"></script>
     <script type="module" src="js/main.js"></script>
 </head>
@@ -61,30 +13,32 @@
     <div class="container">
         <h2>Route aus UTM-Ref Koordinaten generieren</h2>
         <div id="headline" class="mt-3 mb-3" style="font-weight:bold;"></div>
-        <div class="form-check mb-3">
-            <input type="checkbox" class="form-check-input" id="useCurrentLocation">
-            <label class="form-check-label" for="useCurrentLocation">Aktuelle Position als Startpunkt verwenden</label>
+        <div class="input-group mb-3">
+            <input type="text" id="coords-input" class="form-control" placeholder="32U NF 21085 73351">
+            <button id="add-button" class="btn btn-primary" onclick="addCoords()">+</button>
         </div>
-        <textarea id="coords-input" class="form-control mb-3" rows="5" placeholder="UTM-Ref Koordinaten hier eingeben...&#10;32U NF 21085 73351&#10;32U NE 61430 73289"></textarea>
-        <div class="d-flex flex-row flex-wrap justify-content-start align-items-start">
-            <button onclick="submitCoords()" class="btn btn-primary mb-3 me-2">Generieren</button>
-            <div id="button-container-top" class="ml-2"></div> <!-- Button container next to/under the convert button -->
-        </div>
+        <button id="add-current-location-button" class="btn btn-outline-info mb-3" onclick="toggleCurrentLocation()">Aktuelle Position als Startpunkt festlegen</button>
+        <button class="reset mb-3 btn btn-warning" onClick="window.location.reload();">Neustarten</button>
         <div id="message" style="display: none; color: red;"></div>
-        
+        <div class="buttons-div">
+            <div id="button-container-top" class="mb-3"></div>
+            <div id="button-container-maps-top" class="mb-3"></div>
+        </div>
         <table id="resultsTable" class="table table-striped" style="display: none;">
             <thead>
                 <tr>
                     <th></th>
                     <th>UTM-Ref</th>
-                    <th>Koordinaten</th>
-                    <th>Ort</th>
+                    <th>Lat. Lon. Coord.</th>
+                    <th>Place</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-        <div id="button-container-bottom" class="mb-3"></div>
-        <div id="map" style="height: 500px; width: 100%;"></div>
+        <div class="buttons-div">
+            <div id="button-container-bottom" class="mb-3"></div>
+            <div id="button-container-maps-bottom" class="mb-3"></div>
+        </div>
     </div>
 </body>
 </html>
