@@ -1,6 +1,6 @@
 // Reverse geocode coordinates using the Google Maps API
 async function reverseGeocode(coords) {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lon}&key=AIzaSyBbvkdgwdv3kRAA4Q3jy5r52M5sR6-OUg4`);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lon}&key=YOUR_API_KEY`);
     const data = await response.json();
     return data.results[0]?.formatted_address || "Unknown location";
 }
