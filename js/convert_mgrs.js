@@ -21,6 +21,11 @@ function convertLatLonToMgrs(latLon) {
     }
 }
 
+// Function to format MGRS coordinates for display
+function formatMGRS(mgrs) {
+    return mgrs.replace(/^(\d{1,2}[C-X])([A-HJ-NP-Z]{2})(\d{5})(\d{5})$/, '$1 $2 $3 $4');
+}
+
 // Function to convert MGRS coordinates and create a list of waypoints
 function convertMgrs(mgrs_coords) {
     const LatLon_coords = mgrs_coords.map(mgrs => convertMgrsToLatLon(mgrs));
@@ -48,9 +53,4 @@ function convertMgrs(mgrs_coords) {
     return { startingLocation, finalDestination, full_route };
 }
 
-// Function to format MGRS coordinates for display
-function formatMGRS(mgrs) {
-    return mgrs.replace(/^(\d{1,2}[C-X])([A-HJ-NP-Z]{2})(\d{5})(\d{5})$/, '$1 $2 $3 $4');
-}
-
-export { convertMgrs, convertMgrsToLatLon, convertLatLonToMgrs };
+export { convertMgrs, convertMgrsToLatLon, convertLatLonToMgrs, formatMGRS };

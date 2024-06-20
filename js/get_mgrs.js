@@ -1,3 +1,5 @@
+let list_of_mgrs = [];
+
 // Add an event listener to the input field to validate input in real-time
 document.getElementById('coords-input').addEventListener('input', validateInput);
 
@@ -29,4 +31,9 @@ function isValidMGRS(mgrsStr) {
     }
 }
 
-export { isValidMGRS };
+// Function to add MGRS to the list
+function addMGRSToList(mgrsStr) {
+    list_of_mgrs.push(mgrsStr);
+}
+
+export { isValidMGRS, addMGRSToList, list_of_mgrs };

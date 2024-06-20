@@ -1,8 +1,9 @@
-import { isValidMGRS } from './get_mgrs.js';
-import { convertMgrsToLatLon, convertLatLonToMgrs } from './convert_mgrs.js';
+import { isValidMGRS, addMGRSToList, list_of_mgrs } from './get_mgrs.js';
+import { convertMgrs, convertMgrsToLatLon, convertLatLonToMgrs, formatMGRS } from './convert_mgrs.js';
 import { displayTable } from './display_table.js';
 import { createGoogleMapsLink, createRouteButton } from './create_route.js';
 import { getPlaceNames } from './get_placeNames.js';
+import { getUserLocation } from './getUserLocation.js';
 
 let full_route = [];
 let startingLocation = null;
@@ -32,21 +33,20 @@ function validateInput() {
 async function addCoords() {
     const input = document.getElementById('coords-input').value.trim();
     if (isValidMGRS(input)) {
-        const formattedMgrs = formatMGRS(input);
-        const latLon = window.mgrs.toPoint(formattedMgrs.replace(/\s+/g, ''));
-        const place = await getPlaceName(latLon[1], latLon[0]);
+        const latLon = convertMgrsToLatLon(input);
+        const place = await getPlaceName(latLon.lat, latLon.lon);
         const location = {
-            mgrs: formattedMgrs,
-            neCoordinate: { lat: latLon[1], lon: latLon[0] },
+            mgrs: formatMGRS(input),
+            neCoordinate: latLon,
             place
         };
-        full_route.push(location);
 
         if (!startingLocation) {
             startingLocation = location;
-        } else {
-            finalDestination = location;
         }
+        
+        full_route.push(location); // Add new location to the full route
+        finalDestination = location;
 
         updateTable();
         document.getElementById('coords-input').value = '';
@@ -64,12 +64,12 @@ async function toggleCurrentLocation() {
     const button = document.getElementById('add-current-location-button');
     if (userLocationAdded) {
         removeCurrentLocation();
-        button.innerText = 'Aktuelle Position als Startpunkt festlegen';
+        button.innerText = 'Von hier starten';
         button.classList.remove('btn-outline-danger');
         button.classList.add('btn-outline-info');
     } else {
         await addCurrentLocation();
-        button.innerText = 'Aktuelle Position als Startpunkt entfernen';
+        button.innerText = 'Nicht von hier starten';
         button.classList.remove('btn-outline-info');
         button.classList.add('btn-outline-danger');
     }
@@ -84,8 +84,6 @@ async function toggleCurrentLocation() {
         removeRouteButtons();
         routeButtonsCreated = false;
     }
-    
-
 }
 
 // Add the current user location as the start location
@@ -100,8 +98,15 @@ async function addCurrentLocation() {
             neCoordinate: position,
             place
         };
-        full_route.unshift(location);
+
+        if (full_route.length > 0) {
+            full_route.unshift(location);
+        } else {
+            full_route = [location];
+        }
+
         startingLocation = location;
+
 
         updateTable();
     } catch (error) {
@@ -111,32 +116,31 @@ async function addCurrentLocation() {
 
 // Remove the current user location from the start location
 function removeCurrentLocation() {
-    if (full_route.length > 0 && startingLocation) {
-        full_route.shift();
+    if (userLocationAdded && full_route.length > 0 && startingLocation) {
+        full_route.shift(); // Remove the current location
         startingLocation = full_route.length > 0 ? full_route[0] : null;
-        finalDestination = full_route.length > 1 ? full_route[full_route.length - 1] : null;
+        finalDestination = full_route.length >= 1 ? full_route[full_route.length - 1] : null;
         updateTable();
     }
 }
 
-// Get user location using geolocation API
-function getUserLocation() {
-    return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
-                resolve({ lat: position.coords.latitude, lon: position.coords.longitude });
-            }, error => {
-                reject(error);
-            });
-        } else {
-            reject(new Error('Geolocation is not supported by this browser.'));
-        }
-    });
-}
-
 // Update the table with the current route
 function updateTable() {
-    displayTable(startingLocation, finalDestination, full_route.slice(1, -1));
+    let waypoints = [];
+    if (full_route.length > 2) {
+        waypoints = full_route.slice(1, -1);
+    }
+
+    if (full_route.length === 1) {
+        startingLocation = full_route[0];
+        finalDestination = '';
+    } else {
+        startingLocation = full_route[0];
+        finalDestination = full_route[full_route.length - 1];
+    }
+
+    console.log("Updating table with:", { startingLocation, finalDestination, waypoints });
+    displayTable(startingLocation, finalDestination, waypoints);
 }
 
 // Create the generate route buttons
@@ -188,11 +192,6 @@ async function getPlaceName(lat, lon) {
     const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
     const data = await response.json();
     return data.display_name;
-}
-
-// Function to format MGRS coordinates for display
-function formatMGRS(mgrs) {
-    return mgrs.replace(/^(\d{1,2}[C-X])([A-HJ-NP-Z]{2})(\d{5})(\d{5})$/, '$1 $2 $3 $4');
 }
 
 document.getElementById('coords-input').addEventListener('input', validateInput);

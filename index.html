@@ -11,25 +11,27 @@
 </head>
 <body>
     <div class="container">
-        <h2>Route aus UTM-Ref Koordinaten generieren</h2>
-        <div id="headline" class="mt-3 mb-3" style="font-weight:bold;"></div>
-        <div class="input-group mb-3">
-            <input type="text" id="coords-input" class="form-control" placeholder="32U NF 21085 73351">
-            <button id="add-button" class="btn btn-primary" onclick="addCoords()">+</button>
-        </div>
-        <button id="add-current-location-button" class="btn btn-outline-info mb-3" onclick="toggleCurrentLocation()">Aktuelle Position als Startpunkt festlegen</button>
-        <button class="reset mb-3 btn btn-warning" onClick="window.location.reload();">Neustarten</button>
-        <div id="message" style="display: none; color: red;"></div>
-        <div class="buttons-div">
-            <div id="button-container-top" class="mb-3"></div>
-            <div id="button-container-maps-top" class="mb-3"></div>
+        <div class="container container-top">
+            <h2>Route aus UTM-Ref Koordinaten generieren</h2>
+            <div id="headline" class="mt-3 mb-3" style="font-weight:bold;"></div>
+            <div class="input-group mb-3">
+                <input type="text" id="coords-input" class="form-control" placeholder="32U NF 21085 73351">
+                <button id="add-button" class="btn btn-primary" onclick="addCoords()">+</button>
+            </div>
+            <button id="add-current-location-button" class="btn btn-outline-info mb-3" onclick="toggleCurrentLocation()">Von hier starten</button>
+            <button class="reset mb-3 btn btn-warning" onClick="window.location.reload();">Neustarten</button>
+            <div id="message" style="display: none; color: red;"></div>
+            <div class="buttons-div">
+                <div id="button-container-top" class="mb-3"></div>
+                <div id="button-container-maps-top" class="mb-3"></div>
+            </div>
         </div>
         <table id="resultsTable" class="table table-striped" style="display: none;">
             <thead>
                 <tr>
                     <th></th>
-                    <th>UTM-Ref</th>
-                    <th>Lat. Lon. Coord.</th>
+                    <!-- <th>UTM-Ref</th>
+                    <th>Lat. Lon. Coord.</th> -->
                     <th>Place</th>
                 </tr>
             </thead>

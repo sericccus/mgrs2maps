@@ -1,8 +1,11 @@
 /* Base styles */
 body {
     font-family: Arial, sans-serif;
+    
   }
-
+.container-top {
+  text-align: center;
+}
   /* Mobile styles */
   @media (max-width: 600px) {
     body {

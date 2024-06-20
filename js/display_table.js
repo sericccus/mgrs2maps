@@ -1,3 +1,5 @@
+import { formatMGRS } from './convert_mgrs.js';
+
 // Function to display the table with route information
 function displayTable(startingLocation, finalDestination, list_of_waypoints) {
     const resultsTable = document.getElementById('resultsTable');
@@ -26,23 +28,9 @@ function addTableRow(tableBody, label, mgrs, lat, lon, place) {
     let row = tableBody.insertRow();
     row.insertCell(0).textContent = label;
 
-    // Format MGRS
-    let formattedMgrs = formatMGRS(mgrs);
-    let mgrsCell = row.insertCell(1);
-    mgrsCell.innerHTML = formattedMgrs.replace(/\s/g, '<br>');
-
-    // Format Lat/Lon
-    let latLonCell = row.insertCell(2);
-    latLonCell.innerHTML = `${lat.toFixed(5)}<br>${lon.toFixed(5)}`;
-
     // Format Place
-    let placeCell = row.insertCell(3);
+    let placeCell = row.insertCell(1);
     placeCell.innerHTML = formatPlace(place);
-}
-
-// Function to format MGRS coordinates for display
-function formatMGRS(mgrs) {
-    return mgrs.replace(/^(\d{1,2}[C-X])([A-HJ-NP-Z]{2})(\d{5})(\d{5})$/, '$1 $2 $3 $4');
 }
 
 // Function to format place for display

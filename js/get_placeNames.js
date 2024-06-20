@@ -1,3 +1,4 @@
+// get_placeNames.js
 // Function to reverse geocode coordinates using OpenStreetMap Nominatim API
 async function getPlaceNames({ startingLocation, finalDestination, list_of_waypoints }) {
     const reverseGeocode = async (lat, lon) => {
